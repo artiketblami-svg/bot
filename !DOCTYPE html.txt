@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Анонимный Чат</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            font-family: Arial;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            margin: 0;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .chat-area {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            min-height: 300px;
+        }
+        .message {
+            margin: 10px 0;
+            padding: 8px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 5px;
+        }
+        input, button {
+            padding: 10px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            width: 100%;
+        }
+        input {
+            background: white;
+            color: black;
+        }
+        button {
+            background: #0088cc;
+            color: white;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💬 Анонимный Чат</h1>
+            <p>Общайтесь анонимно с другими участниками</p>
+        </div>
+
+        <div id="nameScreen">
+            <input type="text" id="nameInput" placeholder="Введите ваше имя">
+            <button onclick="enterChat()">Войти в чат</button>
+        </div>
+
+        <div id="chatScreen" style="display: none;">
+            <div class="chat-area" id="chatMessages">
+                <div class="message">Добро пожаловать в чат!</div>
+            </div>
+            <input type="text" id="messageInput" placeholder="Введите сообщение">
+            <button onclick="sendMessage()">Отправить</button>
+        </div>
+    </div>
+
+    <script>
+        let userName = '';
+
+        // Инициализация Telegram Mini App
+        Telegram.WebApp.expand();
+        Telegram.WebApp.ready();
+
+        function enterChat() {
+            userName = document.getElementById('nameInput').value.trim();
+            if (userName.length < 2) {
+                alert('Введите имя (минимум 2 символа)');
+                return;
+            }
+
+            document.getElementById('nameScreen').style.display = 'none';
+            document.getElementById('chatScreen').style.display = 'block';
+
+            // Добавляем приветственное сообщение
+            addMessage('Система', `Добро пожаловать, ${userName}!`);
+
+            // Симуляция других пользователей
+            simulateChat();
+        }
+
+        function sendMessage() {
+            const messageInput = document.getElementById('messageInput');
+            const text = messageInput.value.trim();
+
+            if (text) {
+                addMessage(userName, text);
+                messageInput.value = '';
+
+                // Симуляция ответа
+                setTimeout(simulateResponse, 2000);
+            }
+        }
+
+        function addMessage(name, text) {
+            const messagesDiv = document.getElementById('chatMessages');
+            const time = new Date().toLocaleTimeString();
+
+            messagesDiv.innerHTML += `
+                <div class="message">
+                    <strong>${name}:</strong> ${text} 
+                    <small>(${time})</small>
+                </div>
+            `;
+
+            // Прокрутка вниз
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function simulateChat() {
+            const botNames = ["Алексей", "Мария", "Дмитрий", "Анна"];
+            const messages = [
+                "Привет всем! Как дела?",
+                "Кто-нибудь здесь?",
+                "Отличный чат!",
+                "Рад присоединиться!"
+            ];
+
+            setTimeout(() => {
+                const randomName = botNames[Math.floor(Math.random() * botNames.length)];
+                const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+                addMessage(randomName, randomMessage);
+
+                // Продолжаем симуляцию
+                setTimeout(simulateChat, 5000);
+            }, 3000);
+        }
+
+        function simulateResponse() {
+            const responses = ["Интересно!", "Согласен", "Расскажи подробнее"];
+            const names = ["Иван", "Елена", "Сергей"];
+
+            const randomName = names[Math.floor(Math.random() * names.length)];
+            const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+            addMessage(randomName, randomResponse);
+        }
+
+        // Отправка по Enter
+        document.getElementById('messageInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        // Отправка по Enter в поле имени
+        document.getElementById('nameInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') enterChat();
+        });
+    </script>
+</body>
+</html>
